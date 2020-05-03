@@ -24,38 +24,14 @@ namespace VentilatorTesting
     public sealed partial class MainPage : Page
     {
 
-        private const int LED_PIN = 23;
-        private GpioPinValue state;
-        private GpioPin pin;
-        private DispatcherTimer timer;
-
         public MainPage()
         {
-            state = GpioPinValue.High;
             this.InitializeComponent();
-
-            
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
-            pin = GpioController.GetDefault().OpenPin(LED_PIN);
-            pin.SetDriveMode(GpioPinDriveMode.Output);
-            pin.Write(state);
-
-            timer = new DispatcherTimer()
-            {
-                Interval = new TimeSpan(0, 0, 5)
-            };
-            timer.Tick += Timer_Tick;
-            timer.Start();
-        }
-
-        private void Timer_Tick(object sender, object e)
-        {
-            state = state == GpioPinValue.High ? GpioPinValue.Low : GpioPinValue.High;
-            pin.Write(state);
         }
     }
 }
