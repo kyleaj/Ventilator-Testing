@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -22,6 +23,8 @@ namespace VentilatorTesting
     /// </summary>
     sealed partial class App : Application
     {
+        public SensorManager Sensors;
+
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
         /// executed, and as such is the logical equivalent of main() or WinMain().
@@ -71,6 +74,19 @@ namespace VentilatorTesting
                 // Ensure the current window is active
                 Window.Current.Activate();
             }
+
+            SensorManager.CreateSensorManager().ContinueWith((res) =>
+            {
+                if (res.IsFaulted)
+                {
+                    Debug.WriteLine("Sensor Manager creation faulted :(");
+                    Debug.WriteLine(res.Exception);
+                } else
+                {
+                    Debug.WriteLine("Sensor Manager creation succeeded!");
+                    Sensors = res.Result;
+                }
+            });
         }
 
         /// <summary>
@@ -94,6 +110,10 @@ namespace VentilatorTesting
         {
             var deferral = e.SuspendingOperation.GetDeferral();
             //TODO: Save application state and stop any background activity
+            if (Sensors != null)
+            {
+                Sensors.Dispose();
+            }
             deferral.Complete();
         }
     }
