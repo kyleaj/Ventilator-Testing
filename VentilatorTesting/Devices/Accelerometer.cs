@@ -108,9 +108,10 @@ namespace VentilatorTesting.Devices
 
                 // Calculate angle of vector from vertical (the z direction)
                 Vector3 accel = new Vector3(x_accel, y_accel, z_accel);
-                Vector3 vert = new Vector3(0, 0, -1);
+                Vector3 vert = new Vector3(0, 0, 1);
 
                 float angle = (float)Math.Acos(Vector3.Dot(accel, vert) / (accel.Length() * vert.Length()));
+                angle *= 180 / (float)Math.PI;
 
                 Debug.WriteLine("Angle: " + angle);
                 return angle;
