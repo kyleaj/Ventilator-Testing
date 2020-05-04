@@ -56,15 +56,7 @@ namespace VentilatorTesting.Devices
             }
 
             // Set range to +/- 2g for max precision
-            byte format = ReadRegister(SensorConstants.ACCEL_REG_DEV_ID);
-
-            // Update the data rate
-            format = (byte)(format & ~0x0F);
-            format = (byte)(format | SensorConstants.ACCEL_RANGE_2_G);
-
-            // Make sure that the FULL-RES bit is enabled for range scaling
-            format = (byte)(format | 0x08);
-            WriteRegister(SensorConstants.ACCEL_REG_DATA_FORMAT, format);
+            WriteRegister(SensorConstants.ACCEL_REG_DATA_FORMAT, SensorConstants.ACCEL_RANGE);
 
             // Enable measurements
             WriteRegister(SensorConstants.ACCEL_REG_POWER_CTL, 0x08);
@@ -104,18 +96,15 @@ namespace VentilatorTesting.Devices
 
             try
             {
-                float x_accel = Read16bitRegister(SensorConstants.ACCEL_X_REG)
-                    * SensorConstants.ACCEL_MG2G;
+                short x_accel = Read16bitRegister(SensorConstants.ACCEL_X_REG);
 
-                float y_accel = Read16bitRegister(SensorConstants.ACCEL_Y_REG)
-                    * SensorConstants.ACCEL_MG2G;
+                short y_accel = Read16bitRegister(SensorConstants.ACCEL_Y_REG);
 
-                float z_accel = Read16bitRegister(SensorConstants.ACCEL_Z_REG)
-                    * SensorConstants.ACCEL_MG2G;
+                short z_accel = Read16bitRegister(SensorConstants.ACCEL_Z_REG);
 
-                Debug.WriteLine("X: " + x_accel);
-                Debug.WriteLine("Y: " + y_accel);
-                Debug.WriteLine("Z: " + z_accel);
+                Debug.WriteLine("X: " + x_accel*0.04f); // Convert microg to g
+                Debug.WriteLine("Y: " + y_accel*0.04f);
+                Debug.WriteLine("Z: " + z_accel*0.04f);
 
                 // Calculate angle of vector from vertical (the z direction)
                 Vector3 accel = new Vector3(x_accel, y_accel, z_accel);

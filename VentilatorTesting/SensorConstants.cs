@@ -16,9 +16,8 @@ namespace VentilatorTesting
 
         public static readonly byte ACCEL_REG_DEV_ID = 0x00;
         public static readonly byte ACCEL_REG_DATA_FORMAT = 0x31;
-        public static readonly byte ACCEL_RANGE_2_G = 0b00;
+        public static readonly byte ACCEL_RANGE = 0x08;
         public static readonly byte ACCEL_REG_POWER_CTL = 0x2D;
-        public static readonly float ACCEL_MG2G = 0.038f; // (9.81*2)/(2^9-1), as measurements are 10 bit 2's complement
         public static readonly byte ACCEL_X_REG = 0x32;
         public static readonly byte ACCEL_Y_REG = 0x34;
         public static readonly byte ACCEL_Z_REG = 0x36;
