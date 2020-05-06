@@ -11,7 +11,7 @@ using Windows.Devices.I2c;
 
 namespace VentilatorTesting.Devices
 {
-    class Accelerometer : IDisposable
+    class Accelerometer : Sensor, IDisposable
     {
         private I2cDevice sensor;
 
@@ -65,24 +65,17 @@ namespace VentilatorTesting.Devices
         // Read 1 byte from register
         private byte ReadRegister(byte register)
         {
-            sensor.Write(new byte[] { register });
-            byte[] buffer = new byte[1];
-            sensor.Read(buffer);
-            return buffer[0];
+            return ReadRegister(sensor, register);
         }
 
         private short Read16bitRegister(byte register)
         {
-            sensor.Write(new byte[] { register });
-            byte[] buffer = new byte[2];
-            sensor.Read(buffer);
-            Debug.WriteLine(String.Join(", ", buffer));
-            return (short)(buffer[0] | (buffer[1] << 8));
+            return Read16bitRegister(sensor, register);
         }
 
         private void WriteRegister(byte register, byte data)
         {
-            sensor.Write(new byte[] { register, data });
+            WriteRegister(sensor, register, data);
         }
 
         public byte GetDeviceID()
@@ -92,7 +85,7 @@ namespace VentilatorTesting.Devices
 
         public float? GetAngle()
         {
-            Debug.WriteLine("Reading accelerations...");
+            //Debug.WriteLine("Reading accelerations...");
 
             try
             {
@@ -102,9 +95,9 @@ namespace VentilatorTesting.Devices
 
                 short z_accel = Read16bitRegister(SensorConstants.ACCEL_Z_REG);
 
-                Debug.WriteLine("X: " + x_accel*0.04f); // Convert microg to g
-                Debug.WriteLine("Y: " + y_accel*0.04f);
-                Debug.WriteLine("Z: " + z_accel*0.04f);
+                //Debug.WriteLine("X: " + x_accel*0.04f); // Convert microg to g
+                //Debug.WriteLine("Y: " + y_accel*0.04f);
+                //Debug.WriteLine("Z: " + z_accel*0.04f);
 
                 // Calculate angle of vector from vertical (the z direction)
                 Vector3 accel = new Vector3(x_accel, y_accel, z_accel);
@@ -113,7 +106,7 @@ namespace VentilatorTesting.Devices
                 float angle = (float)Math.Acos(Vector3.Dot(accel, vert) / (accel.Length() * vert.Length()));
                 angle *= 180 / (float)Math.PI;
 
-                Debug.WriteLine("Angle: " + angle);
+                //Debug.WriteLine("Angle: " + angle);
                 return angle;
             } catch (Exception e)
             {
@@ -121,8 +114,6 @@ namespace VentilatorTesting.Devices
                 Debug.WriteLine(e);
                 return null;
             }
-
-            return null;
         }
 
         public void Dispose()

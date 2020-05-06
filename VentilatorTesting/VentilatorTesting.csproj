@@ -119,12 +119,14 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Devices\Barometer.cs" />
     <Compile Include="Devices\Accelerometer.cs" />
     <Compile Include="Enums\Patient.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Sensor.cs" />
     <Compile Include="SensorConstants.cs" />
     <Compile Include="SensorManager.cs" />
   </ItemGroup>
