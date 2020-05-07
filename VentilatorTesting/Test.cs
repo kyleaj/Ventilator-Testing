@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.Storage;
 
 namespace VentilatorTesting
 {
@@ -28,8 +30,9 @@ namespace VentilatorTesting
             Name = name;
             Created = DateTime.Now;
             Running = true;
-            VolumeData = new FlushableList<float>($"{Name}_{Created}_VolumeData.csv"); // TODO: Add in local path
-            PressureData = new FlushableList<bool>($"{Name}_{Created}_PressureData.csv");
+            string localPath = ApplicationData.Current.LocalFolder.Path;
+            VolumeData = new FlushableList<float>(Path.Combine(localPath, $"{Name}_{Created}_VolumeData.csv"));
+            PressureData = new FlushableList<bool>(Path.Combine(localPath, $"{Name}_{Created}_PressureData.csv"));
         }
     }
 }

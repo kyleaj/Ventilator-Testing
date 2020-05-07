@@ -9,6 +9,7 @@ namespace VentilatorTesting.Enums
     public enum Patient
     {
         A,
-        B
+        B,
+        Both
     }
 }

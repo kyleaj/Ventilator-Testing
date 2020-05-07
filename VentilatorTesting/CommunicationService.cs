@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -9,6 +10,8 @@ using System.Threading.Tasks;
 using Unosquare.Labs.EmbedIO;
 using Unosquare.Labs.EmbedIO.Constants;
 using Unosquare.Labs.EmbedIO.Modules;
+using Unosquare.Swan;
+using Windows.UI.Xaml;
 
 namespace VentilatorTesting
 {
@@ -48,21 +51,23 @@ namespace VentilatorTesting
             Debug.WriteLine($"Server state change from {e.OldState} to {e.NewState}");
         }
 
-        public void SendVolumeUpdate(float update)
+        public void SendVolumeUpdate(float update, Enums.Patient patient)
         {
             handler.SendMessage(new Message
             {
                 Type = Message.MessageType.VolumeUpdate,
-                Data = update
+                Data = update,
+                AffectedPatient = patient
             });
         }
 
-        public void SendPressureUpdate(bool update)
+        public void SendPressureUpdate(bool update, Enums.Patient patient)
         {
             handler.SendMessage(new Message
             {
                 Type = Message.MessageType.PressureUpdate,
-                Data = update
+                Data = update,
+                AffectedPatient = patient
             });
         }
 
@@ -71,7 +76,8 @@ namespace VentilatorTesting
             handler.SendMessage(new Message
             {
                 Type = Message.MessageType.VolumeUpdate,
-                Data = update
+                Data = update,
+                AffectedPatient = Enums.Patient.Both
             });
         }
     }
@@ -97,15 +103,42 @@ namespace VentilatorTesting
 
         protected override void OnMessageReceived(IWebSocketContext context, byte[] buffer, IWebSocketReceiveResult result)
         {
-            // Handle messages
+            string message_raw = buffer.ToText();
+            Message message = JsonConvert.DeserializeObject<Message>(message_raw);
+
+            switch (message.Type)
+            {
+                case Message.MessageType.StartTestRequest:
+                    var data = (Tuple<string, int>)message.Data;
+                    (Application.Current as App).Sensors.StartTest(data.Item1, data.Item2); // TODO: Handle test already running
+                    break;
+                case Message.MessageType.StopTestRequest:
+                    (Application.Current as App).Sensors.StopTest();
+                    break;
+                case Message.MessageType.TestIndexRequest:
+                    break;
+                case Message.MessageType.TestResultRequest:
+                    break;
+                
+            }
+        }
+
+        private void HandleTestIndexRequest()
+        {
+            // Send a list of the filenames in the Application's local folder
+        }
+
+        private void HandleTestResultRequest()
+        {
+            // Can we send this (possibly big) file over web sockets?
         }
 
         public void SendMessage(Message message)
         {
-            
+            string mess = JsonConvert.SerializeObject(message);
             foreach (var socket in this.WebSockets)
             {
-                //socket.WebSocket.SendAsync()
+                Send(socket, mess);
             }
         }
     }

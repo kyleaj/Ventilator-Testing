@@ -46,14 +46,24 @@ namespace VentilatorTesting
             }
             if ((Application.Current as App).ComService != null)
             {
-                (Application.Current as App).ComService.SendVolumeUpdate(AngleToVolumeConversion * (float)angle);
+                (Application.Current as App).ComService.SendVolumeUpdate(AngleToVolumeConversion * (float)angle, Enums.Patient.A);
             }
         }
 
-        public void StartTest(string testName, int durationSeconds)
+        public bool StartTest(string testName, int durationSeconds)
         {
+            if (currTest != null)
+            {
+                return false;
+            }
             currTest = new Test(testName);
             ThreadPoolTimer.CreateTimer((timer) => { StopTest(currTest); }, new TimeSpan(0, 0, durationSeconds));
+            return true;
+        }
+
+        public void StopTest()
+        {
+            StopTest(currTest);
         }
 
         public async void StopTest(Test test)

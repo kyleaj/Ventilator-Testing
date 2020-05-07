@@ -21,6 +21,7 @@ namespace VentilatorTesting
         }
 
         public MessageType Type;
+        public Enums.Patient AffectedPatient;
         public object Data;
     }
 }
