@@ -84,7 +84,7 @@ namespace VentilatorTesting
 
     class VentilatorConnectionsHandler : WebSocketsServer
     {
-        public override string ServerName => throw new NotImplementedException();
+        public override string ServerName => "VentTestServ";
 
         protected override void OnClientConnected(IWebSocketContext context, IPEndPoint localEndPoint, IPEndPoint remoteEndPoint)
         {
