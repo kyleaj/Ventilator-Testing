@@ -47,6 +47,33 @@ namespace VentilatorTesting
         {
             Debug.WriteLine($"Server state change from {e.OldState} to {e.NewState}");
         }
+
+        public void SendVolumeUpdate(float update)
+        {
+            handler.SendMessage(new Message
+            {
+                Type = Message.MessageType.VolumeUpdate,
+                Data = update
+            });
+        }
+
+        public void SendPressureUpdate(bool update)
+        {
+            handler.SendMessage(new Message
+            {
+                Type = Message.MessageType.PressureUpdate,
+                Data = update
+            });
+        }
+
+        public void SendTestStatusUpdate(Test.TestStatus update)
+        {
+            handler.SendMessage(new Message
+            {
+                Type = Message.MessageType.VolumeUpdate,
+                Data = update
+            });
+        }
     }
 
     class VentilatorConnectionsHandler : WebSocketsServer
@@ -71,6 +98,15 @@ namespace VentilatorTesting
         protected override void OnMessageReceived(IWebSocketContext context, byte[] buffer, IWebSocketReceiveResult result)
         {
             // Handle messages
+        }
+
+        public void SendMessage(Message message)
+        {
+            
+            foreach (var socket in this.WebSockets)
+            {
+                //socket.WebSocket.SendAsync()
+            }
         }
     }
 }

@@ -16,7 +16,7 @@ namespace VentilatorTesting
 
             public override string ToString()
             {
-                return $"{timeStamp.Subtract(new DateTime(2000, 1, 1)).TotalMilliseconds}, {value}";
+                return $"{timeStamp.Subtract(new DateTime(2000, 1, 1)).TotalMilliseconds},{value}\n";
             }
         }
 
@@ -29,6 +29,8 @@ namespace VentilatorTesting
         public FlushableList(string outputFilePath)
         {
             Path = outputFilePath;
+            List = new List<ListItem>(MAX_LENGTH + 1);
+            File.WriteAllText(Path, "Time,Data\n");
         }
 
         public void Add(T sample)
@@ -36,7 +38,7 @@ namespace VentilatorTesting
             if (List.Count >= MAX_LENGTH)
             {
                 var list = List;
-                List = new List<ListItem>();
+                List = new List<ListItem>(MAX_LENGTH + 1);
                 _ = FlushList();
             }
             List.Add(new ListItem { timeStamp = DateTime.Now, value = sample });

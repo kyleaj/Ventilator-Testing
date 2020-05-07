@@ -8,7 +8,6 @@ namespace VentilatorTesting
 {
     public class SensorConstants
     {
-
         public static readonly float ACCEL_POLL_FREQ = 10F; // Hz
 
         public static readonly short ACCEL_ADDR_P_A = 0x53;
