@@ -119,9 +119,11 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="CommunicationService.cs" />
     <Compile Include="Devices\Barometer.cs" />
     <Compile Include="Devices\Accelerometer.cs" />
     <Compile Include="Enums\Patient.cs" />
+    <Compile Include="FlushableList.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
@@ -129,6 +131,7 @@
     <Compile Include="Sensor.cs" />
     <Compile Include="SensorConstants.cs" />
     <Compile Include="SensorManager.cs" />
+    <Compile Include="Test.cs" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
@@ -157,8 +160,14 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="EmbedIO">
+      <Version>2.9.2</Version>
+    </PackageReference>
+    <PackageReference Include="Makaretu.Dns.Multicast">
+      <Version>0.27.0</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
-      <Version>6.2.8</Version>
+      <Version>6.2.10</Version>
     </PackageReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">

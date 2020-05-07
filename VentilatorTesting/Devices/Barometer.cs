@@ -47,25 +47,36 @@ namespace VentilatorTesting
                 Debug.WriteLine(e);
                 throw e;
             }
-            Debug.WriteLine("Writing to registers");
+            Debug.WriteLine(ReadRegister(sensor, SensorConstants.PRESS_ID_REG).ToString("x"));
+            for (byte i = 0; i <= 0x2d; i++)
+            {
+                Debug.WriteLine("Reg: " + i.ToString("x"));
+                Debug.WriteLine(ReadRegister(sensor, i).ToString("x"));
+            }
+
+            //return null;
+
             WriteRegister(sensor, SensorConstants.PRESS_MODE_REG, SensorConstants.PRESS_MODE_VAL);
             WriteRegister(sensor, SensorConstants.PRESS_EVENT_SET_REG, SensorConstants.PRESS_EVENT_SET_VAL);
             WriteRegister(sensor, SensorConstants.PRESS_MODE_REG, SensorConstants.PRESS_MODE_MEAS_VAL);
-            Debug.WriteLine("Wrote to registers");
+
+            Debug.WriteLine(ReadRegister(sensor, SensorConstants.PRESS_ID_REG).ToString("x"));
 
             Task.Run(async () =>
             {
-                Debug.WriteLine("Starting loop");
                 while (true)
                 {
-                    Debug.WriteLine("Reading status");
                     byte status = ReadRegister(sensor, 0x00);
-                    Debug.WriteLine("Status: " + status);
                     if ((status & 0x04) == 0x04)
                     {
                         int pressure = Read32bitRegister(sensor, 0x01);
-                        pressure = pressure >> 4;
-                        Debug.WriteLine(pressure);
+                        pressure = pressure >> 6;
+                        Debug.WriteLine("Pressure: " + pressure);
+                        for (byte i = 0; i <= 0x2d; i++)
+                        {
+                            Debug.WriteLine("Reg: " + i.ToString("x"));
+                            Debug.WriteLine(ReadRegister(sensor, i).ToString("x"));
+                        }
                     }
                     await Task.Delay(250);
                 }

@@ -9,7 +9,7 @@ namespace VentilatorTesting
     public class SensorConstants
     {
 
-        public static readonly float ACCEL_POLL_FREQ = 0.2F; // Hz
+        public static readonly float ACCEL_POLL_FREQ = 10F; // Hz
 
         public static readonly short ACCEL_ADDR_P_A = 0x53;
         public static readonly short ACCEL_ADDR_P_B = 0x1D;
@@ -23,6 +23,8 @@ namespace VentilatorTesting
         public static readonly byte ACCEL_Z_REG = 0x36;
 
         public static readonly short PRESS_ADDR = 0x60;
+        public static readonly byte PRESS_ID_REG = 0x0C;
+        public static readonly byte PRESS_ID = 0xC4;
         public static readonly short PRESS_INT_P_A_PIN = 13; // Chosen randomly, can change
         public static readonly short PRESS_INT_P_B_PIN = 23; // Chose randomly, can change
         public static readonly byte PRESS_MODE_REG = 0x26;

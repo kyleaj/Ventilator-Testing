@@ -30,12 +30,12 @@ namespace VentilatorTesting
 
         protected static int Read32bitRegister(I2cDevice sensor, byte register)
         {
-            sensor.Write(new byte[] { register });
-            byte[] buffer = new byte[3];
-            sensor.Read(buffer);
-            //Debug.WriteLine(String.Join(", ", buffer));
-            int result = (buffer[0] << 8) | buffer[1];
-            return (result << 8) | buffer[2];
+            // Simultaneous reads make pressure sensor slow, for some reason...
+            byte msb = ReadRegister(sensor, register);
+            byte csb = ReadRegister(sensor, (byte)(register+1));
+            byte lsb = ReadRegister(sensor, (byte)(register+2));
+            int result = (msb << 8) | csb;
+            return (result << 8) | lsb;
         }
 
         protected static void WriteRegister(I2cDevice sensor, byte register, byte data)

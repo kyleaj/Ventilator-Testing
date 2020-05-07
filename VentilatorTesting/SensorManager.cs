@@ -20,13 +20,12 @@ namespace VentilatorTesting
         {
             AccP1 = new Accelerometer(i2cBus, Enums.Patient.A);
             AccPoll = ThreadPoolTimer.CreatePeriodicTimer(PollAcelerometer,
-                new TimeSpan(0, 0, 0, 0, (int)(1000 * SensorConstants.ACCEL_POLL_FREQ)));
-            Barometer.GetBarometers(i2cBus, 0);
+                new TimeSpan(0, 0, 0, 0, (int)(1000 * 1 / SensorConstants.ACCEL_POLL_FREQ)));
+            //Barometer.GetBarometers(i2cBus, 0);
         }
 
         private void PollAcelerometer(ThreadPoolTimer timer)
         {
-            //Debug.WriteLine("Poll timer tick");
             AccP1.GetAngle();
         }
 

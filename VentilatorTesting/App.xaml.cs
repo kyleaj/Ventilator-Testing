@@ -24,7 +24,7 @@ namespace VentilatorTesting
     sealed partial class App : Application
     {
         public SensorManager Sensors;
-
+        public CommunicationService ComService;
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
         /// executed, and as such is the logical equivalent of main() or WinMain().
@@ -85,6 +85,8 @@ namespace VentilatorTesting
                 {
                     Debug.WriteLine("Sensor Manager creation succeeded!");
                     Sensors = res.Result;
+                    ComService = new CommunicationService();
+                    Debug.WriteLine("Started up communication service!");
                 }
             });
         }
