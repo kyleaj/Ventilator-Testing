@@ -2,13 +2,34 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:VentilatorTestConsole"
-             x:Class="VentilatorTestConsole.MainPage">
+             x:Class="VentilatorTestConsole.MainPage"
+             Title="Ventilator Test Bench">
 
     <StackLayout>
-        <!-- Place new controls here -->
-        <Label Text="Welcome to Xamarin.Forms!" 
-           HorizontalOptions="Center"
-           VerticalOptions="CenterAndExpand" />
+        <Label Text="Searching for Ventilators..."
+               VerticalOptions="Start"
+               HorizontalOptions="CenterAndExpand"/>
+        <ListView x:Name="NearbyVents" ItemTapped="NearbyVents_ItemTapped" 
+                  SelectionMode="None" IsVisible="False" VerticalOptions="Start" HorizontalOptions="CenterAndExpand">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <StackLayout Margin="8">
+                        <Label Text="{Binding Name}"/>
+                        <Label Text="{Binding IP}"/>
+                    </StackLayout>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+        <ActivityIndicator VerticalOptions="Center"
+                           HorizontalOptions="Center" IsRunning="True"/>
+        <Label Text="Not finding a ventilator? Try entering its IP manually: "
+               VerticalOptions="End" HorizontalOptions="CenterAndExpand"/>
+        <StackLayout Orientation="Horizontal" VerticalOptions="End" HorizontalOptions="CenterAndExpand">
+            <Entry x:Name="IPEntry" Placeholder="Enter an IP Address Here" 
+               HorizontalOptions="Start" VerticalOptions="CenterAndExpand"/>
+            <Button Text="Connect" HorizontalOptions="End" VerticalOptions="Center"
+                     Clicked="JoinVentViaIP_Clicked"/>
+        </StackLayout>
     </StackLayout>
 
 </ContentPage>

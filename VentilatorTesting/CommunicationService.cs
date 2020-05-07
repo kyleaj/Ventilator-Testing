@@ -48,7 +48,7 @@ namespace VentilatorTesting
             server.Module<WebSocketsModule>().RegisterWebSocketsServer<VentilatorConnectionsHandler>("/TestVent", handler);
 
             server.RegisterModule(new WebApiModule());
-            server.Module<WebApiModule>().RegisterController<PostController>();
+            server.Module<WebApiModule>().RegisterController<GetController>();
 
             server.StateChanged += Server_StateChanged;
 
@@ -168,9 +168,9 @@ namespace VentilatorTesting
         }
     }
 
-    class PostController : WebApiController
+    class GetController : WebApiController
     {
-        public PostController(IHttpContext context) : base(context)
+        public GetController(IHttpContext context) : base(context)
         {
         }
 
