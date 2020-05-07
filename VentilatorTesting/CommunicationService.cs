@@ -126,8 +126,6 @@ namespace VentilatorTesting
                 case Message.MessageType.TestIndexRequest:
                     HandleTestIndexRequest(context);
                     break;
-                case Message.MessageType.TestResultRequest:
-                    break;
                 
             }
         }
@@ -159,20 +157,6 @@ namespace VentilatorTesting
                 Send(requester, response);
             });
         }
-
-        /**private void HandleTestResultRequest(string providerPath)
-        {
-            // Can we send this (possibly big) file over web sockets?
-            // I still have no idea what I'm doing
-            FileStream stream = IFileProvider.OpenFile(providerPath);
-            string contents;
-            using (StreamReader reader = new StreamReader(stream))
-            {
-                contents = reader.ReadToEnd();
-            }
-            Message message = JsonConvert.DeserializeObject<Message>(contents);
-            SendMessage(message);
-        }**/
 
         public void SendMessage(Message message)
         {

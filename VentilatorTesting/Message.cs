@@ -17,8 +17,6 @@ namespace VentilatorTesting
             StopTestRequest,
             TestIndexRequest,
             TestIndexResponse,
-            TestResultRequest,
-            TestResultResponse,
             PeepSet
         }
 
