@@ -123,14 +123,32 @@ namespace VentilatorTesting
             }
         }
 
-        private void HandleTestIndexRequest()
+        private void HandleTestIndexRequest(string providerPath, IMimeTypeProvider mimeTypeProvider)
         {
             // Send a list of the filenames in the Application's local folder
+            // I have no idea what I'm doing
+            IEnumerable<MappedResourceInfo> entries = IFileProvider.GetDirectoryEntries(providerPath, mimeTypeProvider);
+            IEnumerator entriesList = entries.GetEnumerator();
+            foreach(MappedResourceInfo entry in entriesList)
+            {
+                string entry_string = entry.ToString();
+                Message message = JsonConvert.DeserializeObject<Message>(entry_string);
+                SendMessage(message);
+            }
         }
 
-        private void HandleTestResultRequest()
+        private void HandleTestResultRequest(string providerPath)
         {
             // Can we send this (possibly big) file over web sockets?
+            // I still have no idea what I'm doing
+            FileStream stream = IFileProvider.OpenFile(providerPath);
+            string contents;
+            using (StreamReader reader = new StreamReader(stream))
+            {
+                contents = reader.ReadToEnd();
+            }
+            Message message = JsonConvert.DeserializeObject<Message>(contents);
+            SendMessage(message);
         }
 
         public void SendMessage(Message message)
