@@ -10,7 +10,7 @@ namespace VentilatorTestConsole
 
         private int CurrentIndex;
         private int Size;
-        private int Capacity;
+        //private int Capacity;
         private T[] Items;
 
         public ShiftList()
@@ -54,14 +54,24 @@ namespace VentilatorTestConsole
             }
         }
 
-        public void Set(int index)
+        public void Set(int index, T item)
         {
-
+            // Alternatively, take the modulus with Items.Length?
+            if (index >= Items.Length)
+            {
+                throw new IndexOutOfRangeException();
+            }
+            Items[index] = item;
         }
 
-        public void Get(int index)
+        public T Get(int index)
         {
-
+            // Alternatively, take the modulus with Items.Length?
+            if (index >= Items.Length)
+            {
+                throw new IndexOutOfRangeException();
+            }
+            return Items[(index + CurrentIndex) % Items.Length];
         }
     }
 }

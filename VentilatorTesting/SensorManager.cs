@@ -72,7 +72,7 @@ namespace VentilatorTesting
             SensePoll = ThreadPoolTimer.CreatePeriodicTimer(PollSensors,
                 new TimeSpan(0, 0, 0, 0, (int)(1000 * 1 / SensorConstants.ACCEL_POLL_FREQ)));
             
-            AngleToVolumeConversion = 1F/90; // Calculate later
+            AngleToVolumeConversion = 0.5F/90; // Calculate later
         }
 
         private void PollSensors(ThreadPoolTimer timer)
@@ -123,14 +123,14 @@ namespace VentilatorTesting
 
             if ((Application.Current as App).ComService != null)
             {
-                if (angle1 != null)
-                    (Application.Current as App).ComService.SendVolumeUpdate(AngleToVolumeConversion * (float)angle1, Enums.Patient.A);
-                if (angle2 != null)
-                    (Application.Current as App).ComService.SendVolumeUpdate(AngleToVolumeConversion * (float)angle2, Enums.Patient.B);
-                if (pressure1 != null)
-                    (Application.Current as App).ComService.SendPressureUpdate(AngleToVolumeConversion * (float)pressure1, Enums.Patient.A);
-                if (pressure2 != null)
-                    (Application.Current as App).ComService.SendPressureUpdate(AngleToVolumeConversion * (float)pressure2, Enums.Patient.B);
+                angle1 = angle1 == null ? 0 : angle1;
+                (Application.Current as App).ComService.SendVolumeUpdate(AngleToVolumeConversion * (float)angle1, Enums.Patient.A);
+                angle2 = angle2 == null ? 0 : angle2;
+                (Application.Current as App).ComService.SendVolumeUpdate(AngleToVolumeConversion * (float)angle2, Enums.Patient.B);
+                pressure1 = pressure1 == null ? 0 : pressure1;
+                (Application.Current as App).ComService.SendPressureUpdate(AngleToVolumeConversion * (float)pressure1, Enums.Patient.A);
+                pressure2 = pressure2 == null ? 0 : pressure2;
+                (Application.Current as App).ComService.SendPressureUpdate(AngleToVolumeConversion * (float)pressure2, Enums.Patient.B);
             }
         }
 

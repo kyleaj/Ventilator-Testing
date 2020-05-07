@@ -43,6 +43,11 @@ public class LocalCommunicationService
             });
     }
 
+    private void GetCsv() {
+        WebSocketReceiveResult result;
+        
+    }
+
     private void StartReadingMessages()
     {
         Task.Factory.StartNew(async () =>
