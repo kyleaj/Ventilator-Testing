@@ -25,8 +25,49 @@ namespace VentilatorTesting
         private SensorManager(DeviceInformation i2cBus)
         {
             currTest = null;
-            AccP1 = new Accelerometer(i2cBus, Enums.Patient.A);
-            BarP1 = new Barometer(i2cBus, Enums.Patient.A);
+            AccP1 = null;
+            BarP1 = null;
+            AccP2 = null;
+            BarP2 = null;
+
+            try
+            {
+                AccP1 = new Accelerometer(i2cBus, Enums.Patient.A);
+            } catch (Exception e)
+            {
+                Debug.WriteLine("Could not create accelerometer instance");
+                Debug.WriteLine(e);
+            }
+
+            try
+            {
+                AccP2 = new Accelerometer(i2cBus, Enums.Patient.B);
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine("Could not create accelerometer instance");
+                Debug.WriteLine(e);
+            }
+
+            try
+            {
+                BarP1 = new Barometer(i2cBus, Enums.Patient.A);
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine("Could not create accelerometer instance");
+                Debug.WriteLine(e);
+            }
+
+            try
+            {
+                BarP2 = new Barometer(i2cBus, Enums.Patient.B);
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine("Could not create accelerometer instance");
+                Debug.WriteLine(e);
+            }
 
             SensePoll = ThreadPoolTimer.CreatePeriodicTimer(PollSensors,
                 new TimeSpan(0, 0, 0, 0, (int)(1000 * 1 / SensorConstants.ACCEL_POLL_FREQ)));
@@ -36,26 +77,60 @@ namespace VentilatorTesting
 
         private void PollSensors(ThreadPoolTimer timer)
         {
-            float? angle = AccP1.GetAngle();
+            float? angle1 = AccP1?.GetAngle();
+            float? pressure1 = BarP1?.GetPressure();
+
+            float? angle2 = AccP2?.GetAngle();
+            float? pressure2 = BarP2?.GetPressure();
+
             if (currTest != null)
             {
-                if (angle == null)
+                if (angle1 == null)
                 {
                     // Alert user
                 }
                 else
                 {
-                    float volume = AngleToVolumeConversion * (float)angle;
-                    currTest.VolumeData.Add(volume);
+                    float volume = AngleToVolumeConversion * (float)angle1;
+                    currTest.VolumeDataP1.Add(volume);
+                }
+                if (angle2 == null)
+                {
+                    // Alert user
+                }
+                else
+                {
+                    float volume = AngleToVolumeConversion * (float)angle2;
+                    currTest.VolumeDataP2.Add(volume);
+                }
+                if (pressure1 == null)
+                {
+                    // Alert user
+                }
+                else
+                {
+                    currTest.PressureDataP1.Add((float)pressure1);
+                }
+                if (pressure2 == null)
+                {
+                    // Alert user
+                }
+                else
+                {
+                    currTest.PressureDataP2.Add((float)pressure2);
                 }
             }
 
-            float pressure = BarP1.GetPressure();
-            Debug.WriteLine("Pressure: " + pressure);
-
             if ((Application.Current as App).ComService != null)
             {
-                (Application.Current as App).ComService.SendVolumeUpdate(AngleToVolumeConversion * (float)angle, Enums.Patient.A);
+                if (angle1 != null)
+                    (Application.Current as App).ComService.SendVolumeUpdate(AngleToVolumeConversion * (float)angle1, Enums.Patient.A);
+                if (angle2 != null)
+                    (Application.Current as App).ComService.SendVolumeUpdate(AngleToVolumeConversion * (float)angle2, Enums.Patient.B);
+                if (pressure1 != null)
+                    (Application.Current as App).ComService.SendPressureUpdate(AngleToVolumeConversion * (float)pressure1, Enums.Patient.A);
+                if (pressure2 != null)
+                    (Application.Current as App).ComService.SendPressureUpdate(AngleToVolumeConversion * (float)pressure2, Enums.Patient.B);
             }
         }
 
@@ -83,8 +158,10 @@ namespace VentilatorTesting
             }
             if (!test.Running) return;
             test.Running = false;
-            await test.PressureData.FlushList();
-            await test.VolumeData.FlushList();
+            await test.PressureDataP1.FlushList();
+            await test.VolumeDataP1.FlushList();
+            await test.PressureDataP2.FlushList();
+            await test.VolumeDataP2.FlushList();
             // Anything else to do, you think?
         }
 

@@ -69,7 +69,7 @@ namespace VentilatorTesting
             });
         }
 
-        public void SendPressureUpdate(bool update, Enums.Patient patient)
+        public void SendPressureUpdate(float update, Enums.Patient patient)
         {
             handler.SendMessage(new Message
             {
@@ -184,7 +184,7 @@ namespace VentilatorTesting
         }
     }
 
-    public class PostController : WebApiController
+    class PostController : WebApiController
     {
         public PostController(IHttpContext context) : base(context)
         {
@@ -199,7 +199,9 @@ namespace VentilatorTesting
             }
             catch (Exception ex)
             {
+                #pragma warning disable CS0618
                 return await InternalServerError(ex);
+                #pragma warning restore CS0618
             }
         }
     }

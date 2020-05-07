@@ -21,8 +21,10 @@ namespace VentilatorTesting
 
         public string Name;
         DateTime Created;
-        public FlushableList<float> VolumeData;
-        public FlushableList<bool> PressureData;
+        public FlushableList<float> VolumeDataP1;
+        public FlushableList<float> PressureDataP1;
+        public FlushableList<float> VolumeDataP2;
+        public FlushableList<float> PressureDataP2;
         public bool Running;
 
         public Test(string name)
@@ -31,8 +33,10 @@ namespace VentilatorTesting
             Created = DateTime.Now;
             Running = true;
             string localPath = ApplicationData.Current.LocalFolder.Path;
-            VolumeData = new FlushableList<float>(Path.Combine(localPath, $"{Name}_{Created}_VolumeData.csv"));
-            PressureData = new FlushableList<bool>(Path.Combine(localPath, $"{Name}_{Created}_PressureData.csv"));
+            VolumeDataP1 = new FlushableList<float>(Path.Combine(localPath, $"{Name}_{Created}_VolumeData_P1.csv"));
+            PressureDataP1 = new FlushableList<float>(Path.Combine(localPath, $"{Name}_{Created}_PressureData_P1.csv"));
+            VolumeDataP2 = new FlushableList<float>(Path.Combine(localPath, $"{Name}_{Created}_VolumeData_P2.csv"));
+            PressureDataP2 = new FlushableList<float>(Path.Combine(localPath, $"{Name}_{Created}_PressureData_P2.csv"));
         }
     }
 }
