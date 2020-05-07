@@ -21,6 +21,7 @@ namespace VentilatorTesting
         public static readonly byte ACCEL_Y_REG = 0x34;
         public static readonly byte ACCEL_Z_REG = 0x36;
 
+#if MAP_PRESS_SENS
         public static readonly short PRESS_ADDR = 0x60;
         public static readonly byte PRESS_ID_REG = 0x0C;
         public static readonly byte PRESS_ID = 0xC4;
@@ -31,6 +32,18 @@ namespace VentilatorTesting
         public static readonly byte PRESS_EVENT_SET_REG = 0x13;
         public static readonly byte PRESS_EVENT_SET_VAL = 0x06;
         public static readonly byte PRESS_MODE_MEAS_VAL = 0x39; // Oversampling on, in barometer mode, measurement on
+#else
 
+        public static readonly short PRESS_ADDR_A = 0x76;
+        public static readonly short PRESS_ADDR_B = 0x77;
+        public static readonly byte PRESS_ID_REG = 0xD0;
+        public static readonly byte PRESS_ID = 0x58;
+        public static readonly byte PRESS_MODE_REG = 0xF4;
+        public static readonly byte PRESS_MODE_VAL = 0x2b; // Oversampling on x8, temp on, press on, normal mode
+        public static readonly byte PRESS_CONFIG_REG = 0xF5;
+        public static readonly byte PRESS_CONFIG_VAL = 0x05; // Fastest sampling, limited iir, 3 wire spi
+        public static readonly byte PRESS_READ_TEMP_REG = 0xF7;
+        public static readonly byte PRESS_READ_PRESS_REG = 0xFA;
+#endif
     }
 }

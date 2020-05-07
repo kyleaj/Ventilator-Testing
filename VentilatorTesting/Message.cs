@@ -16,8 +16,10 @@ namespace VentilatorTesting
             StartTestRequest,
             StopTestRequest,
             TestIndexRequest,
+            TestIndexResponse,
             TestResultRequest,
-            TestResultResponse
+            TestResultResponse,
+            PeepSet
         }
 
         public MessageType Type;

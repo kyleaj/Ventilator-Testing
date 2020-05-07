@@ -15,7 +15,10 @@ namespace VentilatorTesting
     public class SensorManager : IDisposable
     {
         private Accelerometer AccP1; // Accelerometer for Patient 1
-        private ThreadPoolTimer AccPoll; // Timer to poll accelerometer data
+        private Accelerometer AccP2; // Accelerometer for Patient 2
+        private Barometer BarP1; // Accelerometer for Patient 1
+        private Barometer BarP2; // Accelerometer for Patient 1
+        private ThreadPoolTimer SensePoll; // Timer to poll accelerometer data
         private Test currTest;
         private float AngleToVolumeConversion;
 
@@ -23,13 +26,15 @@ namespace VentilatorTesting
         {
             currTest = null;
             AccP1 = new Accelerometer(i2cBus, Enums.Patient.A);
-            AccPoll = ThreadPoolTimer.CreatePeriodicTimer(PollAcelerometer,
+            BarP1 = new Barometer(i2cBus, Enums.Patient.A);
+
+            SensePoll = ThreadPoolTimer.CreatePeriodicTimer(PollSensors,
                 new TimeSpan(0, 0, 0, 0, (int)(1000 * 1 / SensorConstants.ACCEL_POLL_FREQ)));
-            //Barometer.GetBarometers(i2cBus, 0);
+            
             AngleToVolumeConversion = 1F/90; // Calculate later
         }
 
-        private void PollAcelerometer(ThreadPoolTimer timer)
+        private void PollSensors(ThreadPoolTimer timer)
         {
             float? angle = AccP1.GetAngle();
             if (currTest != null)
@@ -44,6 +49,10 @@ namespace VentilatorTesting
                     currTest.VolumeData.Add(volume);
                 }
             }
+
+            float pressure = BarP1.GetPressure();
+            Debug.WriteLine("Pressure: " + pressure);
+
             if ((Application.Current as App).ComService != null)
             {
                 (Application.Current as App).ComService.SendVolumeUpdate(AngleToVolumeConversion * (float)angle, Enums.Patient.A);
@@ -97,10 +106,25 @@ namespace VentilatorTesting
                 AccP1.Dispose();
                 AccP1 = null;
             }
-            if (AccPoll != null)
+            if (BarP1 != null)
             {
-                AccPoll.Cancel();
-                AccPoll = null;
+                BarP1.Dispose();
+                BarP1 = null;
+            }
+            if (AccP2 != null)
+            {
+                AccP2.Dispose();
+                AccP2 = null;
+            }
+            if (BarP2 != null)
+            {
+                BarP2.Dispose();
+                BarP2 = null;
+            }
+            if (SensePoll != null)
+            {
+                SensePoll.Cancel();
+                SensePoll = null;
             }
         }
     }

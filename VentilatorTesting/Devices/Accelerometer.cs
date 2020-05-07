@@ -11,9 +11,8 @@ using Windows.Devices.I2c;
 
 namespace VentilatorTesting.Devices
 {
-    class Accelerometer : Sensor, IDisposable
+    class Accelerometer : Sensor
     {
-        private I2cDevice sensor;
 
         // Reference: https://github.com/adafruit/Adafruit_ADXL345/blob/master/Adafruit_ADXL345_U.cpp
         public Accelerometer(DeviceInformation deviceInformation, Patient patient)
@@ -62,23 +61,7 @@ namespace VentilatorTesting.Devices
             WriteRegister(SensorConstants.ACCEL_REG_POWER_CTL, 0x08);
         }
 
-        // Read 1 byte from register
-        private byte ReadRegister(byte register)
-        {
-            return ReadRegister(sensor, register);
-        }
-
-        private short Read16bitRegister(byte register)
-        {
-            return Read16bitRegister(sensor, register);
-        }
-
-        private void WriteRegister(byte register, byte data)
-        {
-            WriteRegister(sensor, register, data);
-        }
-
-        public byte GetDeviceID()
+        public override byte GetDeviceID()
         {
             return ReadRegister(SensorConstants.ACCEL_REG_DEV_ID);
         }
@@ -116,15 +99,11 @@ namespace VentilatorTesting.Devices
             }
         }
 
-        public void Dispose()
+        public override void Dispose()
         {
             // Sleep sensor
             WriteRegister(SensorConstants.ACCEL_REG_POWER_CTL, 0x00);
-            if (sensor != null)
-            {
-                sensor.Dispose();
-            }
-            sensor = null;
+            base.Dispose();
         }
     }
 }

@@ -11,6 +11,7 @@ using Unosquare.Labs.EmbedIO;
 using Unosquare.Labs.EmbedIO.Constants;
 using Unosquare.Labs.EmbedIO.Modules;
 using Unosquare.Swan;
+using Windows.Storage;
 using Windows.UI.Xaml;
 
 namespace VentilatorTesting
@@ -32,15 +33,22 @@ namespace VentilatorTesting
 
             server.RegisterModule(new WebSocketsModule());
 
+#pragma warning disable CS0618 // Type or member is obsolete
             server.RegisterModule(new FallbackModule(async (ctx, ct) =>
             {
                 await ctx.JsonResponseAsync(new { Hola = "404: Not found" });
                 return true;
             }));
+#pragma warning restore CS0618 // Type or member is obsolete
+
+
 
             handler = new VentilatorConnectionsHandler();
 
             server.Module<WebSocketsModule>().RegisterWebSocketsServer<VentilatorConnectionsHandler>("/TestVent", handler);
+
+            server.RegisterModule(new WebApiModule());
+            server.Module<WebApiModule>().RegisterController<PostController>();
 
             server.StateChanged += Server_StateChanged;
 
@@ -116,6 +124,7 @@ namespace VentilatorTesting
                     (Application.Current as App).Sensors.StopTest();
                     break;
                 case Message.MessageType.TestIndexRequest:
+                    HandleTestIndexRequest(context);
                     break;
                 case Message.MessageType.TestResultRequest:
                     break;
@@ -123,21 +132,35 @@ namespace VentilatorTesting
             }
         }
 
-        private void HandleTestIndexRequest(string providerPath, IMimeTypeProvider mimeTypeProvider)
+        private void HandleTestIndexRequest(IWebSocketContext requester)
         {
             // Send a list of the filenames in the Application's local folder
-            // I have no idea what I'm doing
-            IEnumerable<MappedResourceInfo> entries = IFileProvider.GetDirectoryEntries(providerPath, mimeTypeProvider);
-            IEnumerator entriesList = entries.GetEnumerator();
-            foreach(MappedResourceInfo entry in entriesList)
+            ApplicationData.Current.LocalFolder.GetFilesAsync().AsTask().ContinueWith((res) =>
             {
-                string entry_string = entry.ToString();
-                Message message = JsonConvert.DeserializeObject<Message>(entry_string);
-                SendMessage(message);
-            }
+                string response;
+                if (res.IsFaulted)
+                {
+                    response = JsonConvert.SerializeObject(
+                        new Message {
+                            Type = Message.MessageType.TestIndexResponse,
+                            Data = null
+                        });
+                } else
+                {
+                    IReadOnlyList<StorageFile> result = res.Result;
+                    IEnumerable<string> testNames = result.Select((a) => a.DisplayName);
+                    response = JsonConvert.SerializeObject(
+                        new Message
+                        {
+                            Type = Message.MessageType.TestIndexResponse,
+                            Data = testNames
+                        });
+                }
+                Send(requester, response);
+            });
         }
 
-        private void HandleTestResultRequest(string providerPath)
+        /**private void HandleTestResultRequest(string providerPath)
         {
             // Can we send this (possibly big) file over web sockets?
             // I still have no idea what I'm doing
@@ -149,7 +172,7 @@ namespace VentilatorTesting
             }
             Message message = JsonConvert.DeserializeObject<Message>(contents);
             SendMessage(message);
-        }
+        }**/
 
         public void SendMessage(Message message)
         {
@@ -157,6 +180,26 @@ namespace VentilatorTesting
             foreach (var socket in this.WebSockets)
             {
                 Send(socket, mess);
+            }
+        }
+    }
+
+    public class PostController : WebApiController
+    {
+        public PostController(IHttpContext context) : base(context)
+        {
+        }
+
+        [WebApiHandler(HttpVerbs.Get, "/api/pressuredata/{filename}")]
+        public async Task<bool> GetFileName(string filename)
+        {
+            try
+            {
+                return await Ok(await ApplicationData.Current.LocalFolder.GetFileAsync(filename));
+            }
+            catch (Exception ex)
+            {
+                return await InternalServerError(ex);
             }
         }
     }

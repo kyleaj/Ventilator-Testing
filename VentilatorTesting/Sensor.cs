@@ -8,10 +8,12 @@ using Windows.Devices.I2c;
 
 namespace VentilatorTesting
 {
-    abstract class Sensor
+    abstract class Sensor : IDisposable
     {
+        protected I2cDevice sensor;
+
         // Read 1 byte from register
-        protected static byte ReadRegister(I2cDevice sensor, byte register)
+        protected byte ReadRegister(byte register)
         {
             sensor.Write(new byte[] { register });
             byte[] buffer = new byte[1];
@@ -19,7 +21,7 @@ namespace VentilatorTesting
             return buffer[0];
         }
 
-        protected static short Read16bitRegister(I2cDevice sensor, byte register)
+        protected short Read16bitRegister(byte register)
         {
             sensor.Write(new byte[] { register });
             byte[] buffer = new byte[2];
@@ -28,20 +30,30 @@ namespace VentilatorTesting
             return (short)(buffer[0] | (buffer[1] << 8));
         }
 
-        protected static int Read32bitRegister(I2cDevice sensor, byte register)
+        protected int Read24bitRegister(byte register)
         {
             // Simultaneous reads make pressure sensor slow, for some reason...
-            byte msb = ReadRegister(sensor, register);
-            byte csb = ReadRegister(sensor, (byte)(register+1));
-            byte lsb = ReadRegister(sensor, (byte)(register+2));
-            int result = (msb << 8) | csb;
-            return (result << 8) | lsb;
+            sensor.Write(new byte[] { register });
+            byte[] buffer = new byte[3];
+            sensor.Read(buffer);
+            //Debug.WriteLine(String.Join(", ", buffer));
+            return (short)((buffer[0] << 16) | (buffer[1] << 8) | buffer[0]);
         }
 
-        protected static void WriteRegister(I2cDevice sensor, byte register, byte data)
+        protected void WriteRegister(byte register, byte data)
         {
             sensor.Write(new byte[] { register, data });
         }
 
+        public abstract byte GetDeviceID();
+
+        public virtual void Dispose()
+        {
+            if (sensor != null)
+            {
+                sensor.Dispose();
+            }
+            sensor = null;
+        }
     }
 }
