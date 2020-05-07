@@ -195,7 +195,9 @@ namespace VentilatorTesting
         {
             try
             {
-                return await Ok(await ApplicationData.Current.LocalFolder.GetFileAsync(filename));
+                var file = await ApplicationData.Current.LocalFolder.GetFileAsync(filename);
+                string text = await FileIO.ReadTextAsync(file);
+                return await Ok(text);
             }
             catch (Exception ex)
             {
