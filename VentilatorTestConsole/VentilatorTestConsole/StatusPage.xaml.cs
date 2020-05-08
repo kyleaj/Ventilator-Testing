@@ -14,8 +14,9 @@ namespace VentilatorTestConsole
     {
 		public StatusPage ()
 		{
-            Children.Add(new PatientStatusView(Patient.A));
-            Children.Add(new PatientStatusView(Patient.B));
+            Title = "Ventilator Status";
+            Children.Add(new PatientStatusView(Patient.A) { Title="Patient 1" });
+            Children.Add(new PatientStatusView(Patient.B) { Title="Patient 2" });
             InitializeComponent ();
 		}
 	}

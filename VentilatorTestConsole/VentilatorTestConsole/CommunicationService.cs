@@ -36,8 +36,8 @@ namespace VentilatorTestConsole
             }
             StayConnected = true;
             VentilatorLink = new ClientWebSocket();
-            Debug.WriteLine($"Trying to connect to ws://{ip}:54321/");
-            await VentilatorLink.ConnectAsync(new Uri($"ws://{ip}:54321/"), new System.Threading.CancellationToken());
+            Debug.WriteLine($"Trying to connect to ws://{ip}:54321/TestVent");
+            await VentilatorLink.ConnectAsync(new Uri($"ws://{ip}:54321/TestVent"), new System.Threading.CancellationToken());
             Debug.WriteLine("Success connecting!");
             ReadMessages();
         }
@@ -67,15 +67,15 @@ namespace VentilatorTestConsole
                     } while (!result.EndOfMessage);
                     // TODO: Proccess message receipt
                     string fullMessage = serializedMessage.ToString();
-                    Debug.WriteLine("Received message: " + fullMessage);
                     var mess = JsonConvert.DeserializeObject<Message>(fullMessage);
                     switch (mess.Type)
                     {
                         case Message.MessageType.PressureUpdate:
+                            double dp = (double)mess.Data;
                             if (mess.AffectedPatient == Patient.A)
-                                (Application.Current as App).StatService.Patient1.RecentPressMeasurements.Add((float)mess.Data);
+                                (Application.Current as App).StatService.Patient1.RecentPressMeasurements.Add((float)dp);
                             else
-                                (Application.Current as App).StatService.Patient2.RecentPressMeasurements.Add((float)mess.Data);
+                                (Application.Current as App).StatService.Patient2.RecentPressMeasurements.Add((float)dp);
                             break;
                         case Message.MessageType.TestIndexResponse:
                             break;
@@ -83,10 +83,11 @@ namespace VentilatorTestConsole
                             (Application.Current as App).StatService.CurrTest = (PatientStatusService.TestStatus)mess.Data;
                             break;
                         case Message.MessageType.VolumeUpdate:
+                            double d = (double)mess.Data;
                             if (mess.AffectedPatient == Patient.A)
-                                (Application.Current as App).StatService.Patient1.RecentVolumMeasurements.Add((float)mess.Data);
+                                (Application.Current as App).StatService.Patient1.RecentVolumMeasurements.Add((float)d);
                             else
-                                (Application.Current as App).StatService.Patient2.RecentVolumMeasurements.Add((float)mess.Data);
+                                (Application.Current as App).StatService.Patient2.RecentVolumMeasurements.Add((float)d);
                             break;
                     }
                 }

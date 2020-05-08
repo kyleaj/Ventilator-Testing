@@ -128,9 +128,9 @@ namespace VentilatorTesting
                 angle2 = angle2 == null ? 0 : angle2;
                 (Application.Current as App).ComService.SendVolumeUpdate(AngleToVolumeConversion * (float)angle2, Enums.Patient.B);
                 pressure1 = pressure1 == null ? 0 : pressure1;
-                (Application.Current as App).ComService.SendPressureUpdate(AngleToVolumeConversion * (float)pressure1, Enums.Patient.A);
+                (Application.Current as App).ComService.SendPressureUpdate((float)pressure1, Enums.Patient.A);
                 pressure2 = pressure2 == null ? 0 : pressure2;
-                (Application.Current as App).ComService.SendPressureUpdate(AngleToVolumeConversion * (float)pressure2, Enums.Patient.B);
+                (Application.Current as App).ComService.SendPressureUpdate((float)pressure2, Enums.Patient.B);
             }
         }
 

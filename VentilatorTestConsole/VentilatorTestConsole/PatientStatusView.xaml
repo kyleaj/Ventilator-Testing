@@ -12,15 +12,15 @@
                 VerticalOptions="Start" 
                 HorizontalOptions="StartAndExpand"
                FontSize="Title"/>
-        <forms:SKCanvasView x:Name="VolumeDisplay" HorizontalOptions="CenterAndExpand"
-                            VerticalOptions="StartAndExpand"
+        <forms:SKCanvasView x:Name="VolumeDisplay" HorizontalOptions="FillAndExpand"
+                            VerticalOptions="FillAndExpand"
                             PaintSurface="VolumeDisplay_PaintSurface" />
         <Label Text="Pressure:"
                 VerticalOptions="Start" 
                 HorizontalOptions="StartAndExpand"
                FontSize="Title"/>
-        <forms:SKCanvasView x:Name="PressureDisplay" HorizontalOptions="CenterAndExpand"
-                            VerticalOptions="StartAndExpand"
+        <forms:SKCanvasView x:Name="PressureDisplay" HorizontalOptions="FillAndExpand"
+                            VerticalOptions="FillAndExpand"
                             PaintSurface="PressureDisplay_PaintSurface"/>
     </StackLayout>
 </ContentPage>

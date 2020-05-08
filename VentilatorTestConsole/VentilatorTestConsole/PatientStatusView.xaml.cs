@@ -18,6 +18,7 @@ namespace VentilatorTestConsole
         bool pageIsActive;
         float MaxVol;
         float MaxPress;
+        float MinPress;
         PatientStatus status;
 
         SKPaint VolPaint;
@@ -33,7 +34,8 @@ namespace VentilatorTestConsole
                 status = (Application.Current as App).StatService.Patient2;
             }
             MaxVol = 0.25F;
-            MaxPress = 1;
+            MaxPress = 111200;
+            MinPress = 110999;
             VolPaint = new SKPaint { Color = SKColors.Blue };
             PressPaint = new SKPaint { Color = SKColors.Green };
             InitializeComponent ();
@@ -59,7 +61,7 @@ namespace VentilatorTestConsole
             {
                 thisMax = startVal;
             }
-            float startY = startVal / MaxVol;
+            float startY = startVal / (MaxVol * 1.1F);
             startY = h - (startY * h);
             float startX = w;
 
@@ -73,14 +75,23 @@ namespace VentilatorTestConsole
                     thisMax = endVal;
                 }
 
-                float endY = endVal / MaxVol;
+                float endY = endVal / (MaxVol * 1.1F);
                 endY = h - (endY * h);
 
-                canvas.DrawLine(startX, startY, endX, endY, VolPaint);
+                canvas.DrawLine(startX, startY-5, endX, endY-5, VolPaint);
 
                 startX = endX;
                 startY = endY;
             }
+            canvas.RotateDegrees(-90);
+            canvas.DrawText("Volume (L)", new SKPoint(-h/2, 10), new SKPaint { Color = SKColors.Black });
+            canvas.RotateDegrees(90);
+            canvas.DrawText($"{((int)(MaxVol * 10))/10f}", new SKPoint(10, 10), new SKPaint { Color = SKColors.Black });
+            canvas.DrawText("0", new SKPoint(10, h-10), new SKPaint { Color = SKColors.Black });
+
+            canvas.DrawText("Time", new SKPoint(w / 2, h), new SKPaint { Color = SKColors.Black });
+            canvas.DrawText("Now", new SKPoint(20, h), new SKPaint { Color = SKColors.Black });
+            canvas.DrawText("Previously", new SKPoint(w - 60, h), new SKPaint { Color = SKColors.Black });
 
             MaxVol = Math.Max(0.25F, (MaxVol + thisMax) / 2);
         }
@@ -93,7 +104,7 @@ namespace VentilatorTestConsole
             {
                 VolumeDisplay.InvalidateSurface();
                 PressureDisplay.InvalidateSurface();
-                await Task.Delay(TimeSpan.FromSeconds(1.0 / 30));
+                await Task.Delay(TimeSpan.FromSeconds(1.0 / 15));
             }
 
             stopwatch.Stop();
@@ -113,13 +124,21 @@ namespace VentilatorTestConsole
 
             float wIncr = w / status.RecentPressMeasurements.Capacity();
             float thisMax = 0;
+            float thisMin = float.MaxValue;
 
             float startVal = status.RecentPressMeasurements.Get(0);
             if (startVal > thisMax)
             {
                 thisMax = startVal;
             }
-            float startY = startVal / MaxPress;
+            if (startVal < thisMin)
+            {
+                thisMin = startVal;
+            }
+
+            float divDiff = MaxPress - MinPress;
+
+            float startY = (startVal - MinPress) / (divDiff*1.1f);
             startY = h - (startY * h);
             float startX = w;
 
@@ -133,16 +152,31 @@ namespace VentilatorTestConsole
                     thisMax = endVal;
                 }
 
-                float endY = endVal / MaxPress;
+                float endY = (endVal - MinPress) / (divDiff * 1.1f);
                 endY = h - (endY * h);
 
-                canvas.DrawLine(startX, startY, endX, endY, VolPaint);
+                canvas.DrawLine(startX, startY-5, endX, endY-5, PressPaint);
 
                 startX = endX;
                 startY = endY;
-            }
 
-            MaxPress = Math.Max(1, (MaxVol + thisMax) / 2);
+                if (startVal < thisMin)
+                {
+                    thisMin = startVal;
+                }
+            }
+            canvas.RotateDegrees(-90);
+            canvas.DrawText("Pressure (kPa)", new SKPoint(-h / 2, 10), new SKPaint { Color = SKColors.Black });
+            canvas.RotateDegrees(90);
+            canvas.DrawText($"{((int)(MaxPress * 10)) / 10000f}", new SKPoint(10, 10), new SKPaint { Color = SKColors.Black });
+            canvas.DrawText($"{((int)(MinPress * 10)) / 10000f}", new SKPoint(10, h - 10), new SKPaint { Color = SKColors.Black });
+
+            canvas.DrawText("Time", new SKPoint(w / 2, h), new SKPaint { Color = SKColors.Black });
+            canvas.DrawText("Now", new SKPoint(20, h), new SKPaint { Color = SKColors.Black });
+            canvas.DrawText("Previously", new SKPoint(w - 60, h), new SKPaint { Color = SKColors.Black });
+
+            MaxPress = Math.Max(1, (MaxPress + thisMax) / 2);
+            MinPress = Math.Min((MinPress + thisMin) / 2, MaxPress - 500);
         }
 
         protected override void OnAppearing()

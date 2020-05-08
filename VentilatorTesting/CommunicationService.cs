@@ -52,6 +52,18 @@ namespace VentilatorTesting
 
             server.StateChanged += Server_StateChanged;
 
+            server.RunAsync().ContinueWith((res) =>
+            {
+                if (res.IsFaulted)
+                {
+                    Debug.WriteLine("Server ran in error");
+                }
+                else
+                {
+                    Debug.WriteLine("Server ran!");
+                }
+            });
+
         }
 
         private void Server_StateChanged(object sender, Unosquare.Labs.EmbedIO.Core.WebServerStateChangedEventArgs e)

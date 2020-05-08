@@ -8,7 +8,8 @@
     <StackLayout>
         <Label Text="Searching for Ventilators..."
                VerticalOptions="Start"
-               HorizontalOptions="CenterAndExpand"/>
+               HorizontalOptions="StartAndExpand"
+               FontSize="Title"/>
         <ListView x:Name="NearbyVents" ItemTapped="NearbyVents_ItemTapped" 
                   SelectionMode="None" IsVisible="False" VerticalOptions="Start" HorizontalOptions="CenterAndExpand">
             <ListView.ItemTemplate>
@@ -23,10 +24,10 @@
         <ActivityIndicator VerticalOptions="Center"
                            HorizontalOptions="Center" IsRunning="True"/>
         <Label Text="Not finding a ventilator? Try entering its IP manually: "
-               VerticalOptions="End" HorizontalOptions="CenterAndExpand"/>
-        <StackLayout Orientation="Horizontal" VerticalOptions="End" HorizontalOptions="CenterAndExpand">
+               VerticalOptions="EndAndExpand" HorizontalOptions="CenterAndExpand"/>
+        <StackLayout Orientation="Horizontal" VerticalOptions="End" HorizontalOptions="FillAndExpand">
             <Entry x:Name="IPEntry" Placeholder="Enter an IP Address Here" 
-               HorizontalOptions="Start" VerticalOptions="CenterAndExpand"/>
+               HorizontalOptions="FillAndExpand" VerticalOptions="CenterAndExpand"/>
             <Button Text="Connect" HorizontalOptions="End" VerticalOptions="Center"
                      Clicked="JoinVentViaIP_Clicked"/>
         </StackLayout>
