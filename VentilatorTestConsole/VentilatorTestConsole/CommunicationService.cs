@@ -1,182 +1,97 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Linq;
+using System.Net;
+using System.Net.WebSockets;
 using System.Text;
+using System.Threading.Tasks;
+using Xamarin.Forms;
 
 namespace VentilatorTestConsole
 {
     public class CommunicationService
     {
-    }
+        private ClientWebSocket VentilatorLink;
+        public ObservableCollection<Ventilator> FoundVentilators;
+        private bool StayConnected;
 
-
-public class LocalCommunicationService
-{
-
-    private readonly WebServer ventilatorServer;
-    private ClientWebSocket ClientLink;
-    private readonly CancellationToken StopEverything;
-
-    public LocalCommunicationService(string ip)
-    {
-        // For now, just use the first IP. In the future, maybe test each address? Or look for IPv4
-        ClientLink = new ClientWebSocket();
-        StopEverything = new CancellationToken();
-        Debug.WriteLine($"Trying to connect to ws://{ip}:54321/");
-        ClientLink
-            .ConnectAsync(new Uri($"ws://{ip}:54321/"), StopEverything)
-            .ContinueWith((res) =>
-            {
-                if (res.IsFaulted)
-                {
-                    Debug.WriteLine("Could not connect :(");
-                    Debug.WriteLine(res.Exception);
-                }
-                else if (res.IsCanceled)
-                {
-                    Debug.WriteLine("Connecting cancelled");
-                }
-                else
-                {
-                    Debug.WriteLine("Successfully connected!");
-                    StartReadingMessages();
-                }
-            });
-    }
-
-    private void GetCsv() {
-        WebSocketReceiveResult result;
-        
-    }
-
-    private void StartReadingMessages()
-    {
-        Task.Factory.StartNew(async () =>
+        public CommunicationService()
         {
-            while (true)
+            // Start searching for Ventilators
+            FoundVentilators = new ObservableCollection<Ventilator>();
+            StayConnected = false;
+        }
+
+        public async Task ConnectToVentilator(IPAddress ip)
+        {
+            if (VentilatorLink != null)
             {
-                WebSocketReceiveResult result;
-                var message = new ArraySegment<byte>(new byte[4096]);
-                StringBuilder serializedMessage = new StringBuilder();
-                do
+                StayConnected = false;
+                await Task.Delay(1000); // Finish anything we're doing
+                await VentilatorLink.CloseAsync(WebSocketCloseStatus.Empty, "Bye", new System.Threading.CancellationToken());
+                VentilatorLink.Dispose();
+            }
+            StayConnected = true;
+            VentilatorLink = new ClientWebSocket();
+            Debug.WriteLine($"Trying to connect to ws://{ip}:54321/");
+            await VentilatorLink.ConnectAsync(new Uri($"ws://{ip}:54321/"), new System.Threading.CancellationToken());
+            Debug.WriteLine("Success connecting!");
+            ReadMessages();
+        }
+
+        private void ReadMessages()
+        {
+            Task.Factory.StartNew(async () =>
+            {
+                while (StayConnected)
                 {
-                    result = await ClientLink.ReceiveAsync(message, StopEverything);
-                    if (result.MessageType == WebSocketMessageType.Text)
+                    WebSocketReceiveResult result;
+                    var message = new ArraySegment<byte>(new byte[4096]);
+                    StringBuilder serializedMessage = new StringBuilder();
+                    do
                     {
-                        var messageBytes = message.Skip(message.Offset).Take(result.Count).ToArray();
-                        string thisMessage = Encoding.UTF8.GetString(messageBytes);
-                        serializedMessage.Append(thisMessage);
-                        if (!result.EndOfMessage)
+                        result = await VentilatorLink.ReceiveAsync(message, new System.Threading.CancellationToken());
+                        if (result.MessageType == WebSocketMessageType.Text)
                         {
-                            Debug.WriteLine("Received partial message: " + thisMessage);
+                            var messageBytes = message.Skip(message.Offset).Take(result.Count).ToArray();
+                            string thisMessage = Encoding.UTF8.GetString(messageBytes);
+                            serializedMessage.Append(thisMessage);
+                            if (!result.EndOfMessage)
+                            {
+                                Debug.WriteLine("Received partial message: " + thisMessage);
+                            }
                         }
+                    } while (!result.EndOfMessage);
+                    // TODO: Proccess message receipt
+                    string fullMessage = serializedMessage.ToString();
+                    Debug.WriteLine("Received message: " + fullMessage);
+                    var mess = JsonConvert.DeserializeObject<Message>(fullMessage);
+                    switch (mess.Type)
+                    {
+                        case Message.MessageType.PressureUpdate:
+                            if (mess.AffectedPatient == Patient.A)
+                                (Application.Current as App).StatService.Patient1.RecentPressMeasurements.Add((float)mess.Data);
+                            else
+                                (Application.Current as App).StatService.Patient2.RecentPressMeasurements.Add((float)mess.Data);
+                            break;
+                        case Message.MessageType.TestIndexResponse:
+                            break;
+                        case Message.MessageType.TestStatusUpdate:
+                            (Application.Current as App).StatService.CurrTest = (PatientStatusService.TestStatus)mess.Data;
+                            break;
+                        case Message.MessageType.VolumeUpdate:
+                            if (mess.AffectedPatient == Patient.A)
+                                (Application.Current as App).StatService.Patient1.RecentVolumMeasurements.Add((float)mess.Data);
+                            else
+                                (Application.Current as App).StatService.Patient2.RecentVolumMeasurements.Add((float)mess.Data);
+                            break;
                     }
-                } while (!result.EndOfMessage);
-                // TODO: Proccess message receipt
-                string fullMessage = serializedMessage.ToString();
-                Debug.WriteLine("Received message: " + fullMessage);
-                var mess = JsonConvert.DeserializeObject<Message>(fullMessage);
-                switch (mess.Type)
-                {
-                    case MessageType.Who:
-                        await HandleWho();
-                        break;
-                    case MessageType.Rules:
-                        HandleRules(mess);
-                        break;
-                    case MessageType.CurrentPlayers:
-                        HandleCurrentPlayersReceived(mess);
-                        break;
-                    case MessageType.PlayerAdded:
-                    case MessageType.PlayerChanged:
-                    case MessageType.PlayerRemoved:
-                        HandlePlayersDeltaUpdate(mess);
-                        break;
-                    case MessageType.Start:
-                        HandleStartGame();
-                        break;
                 }
-            }
-        }, StopEverything, TaskCreationOptions.LongRunning, TaskScheduler.Default);
-    }
+            }, new System.Threading.CancellationToken(), TaskCreationOptions.LongRunning, TaskScheduler.Default);
+        }
 
-/*
-    private async Task HandleWho()
-    {
-        var response = new Message
-        {
-            Type = MessageType.Im,
-            Data = JsonConvert
-                .SerializeObject(
-                    (Application.Current as App).CurrentGame.State.Me)
-        };
-        await GameLink.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(response.ToString())),
-            WebSocketMessageType.Text, true, StopEverything);
-    }
-
-    public void HandleStartGame()
-    {
-
-    }
-
-    private void HandleRules(Message message)
-    {
-        (Application.Current as App).CurrentGame.Settings =
-            JsonConvert.DeserializeObject<GameParameters>(message.Data);
-        Debug.WriteLine("Got rules!");
-    }
-
-    private void HandleCurrentPlayersReceived(Message message)
-    {
-        var players = JsonConvert.DeserializeObject<List<PlayerInfo>>(message.Data);
-        Debug.WriteLine("Got players!");
-#if WINDOWS_UWP
-            CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () => {
-#else
-        Device.BeginInvokeOnMainThread(() =>
-        {
-#endif
-            foreach (var player in players)
-            {
-                Debug.WriteLine("Adding: " + player.Name);
-                (Application.Current as App).CurrentGame.State.Players.Add(player);
-            }
-        })
-
-#if WINDOWS_UWP
-            .AsTask().Wait()
-#endif
-            ;
-        Debug.WriteLine("Added all players!");
-    }
-
-    private void HandlePlayersDeltaUpdate(Message message)
-    {
-#if WINDOWS_UWP
-            CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-            {
-#else
-        Device.BeginInvokeOnMainThread(() =>
-        {
-#endif
-            switch (message.Type)
-            {
-                case MessageType.PlayerAdded:
-                    (Application.Current as App).CurrentGame.State.Players
-                        .Add(JsonConvert.DeserializeObject<PlayerInfo>(message.Data));
-                    break;
-                case MessageType.PlayerChanged:
-                    Debug.WriteLine("Players can't change yet!");
-                    break;
-                case MessageType.PlayerRemoved:
-                    (Application.Current as App).CurrentGame.State.Players
-                        .Remove(JsonConvert.DeserializeObject<PlayerInfo>(message.Data));
-                    break;
-            }
-        })
-#if WINDOWS_UWP
-            .AsTask().Wait()
-#endif
-            ;
-        }*/
     }
 }

@@ -18,12 +18,12 @@ namespace VentilatorTestConsole
         private void JoinVentViaIP_Clicked(object sender, EventArgs e)
         {
             string text = IPEntry.Text;
-            //(Application.Current as App).ComService.Connect(IPAddress.Parse(text));
+            (Application.Current as App).ComService.ConnectToVentilator(IPAddress.Parse(text));
         }
 
         private void NearbyVents_ItemTapped(object sender, ItemTappedEventArgs e)
         {
-            //(Application.Current as App).ComService.Connect(e.Item.IP);
+            (Application.Current as App).ComService.ConnectToVentilator(IPAddress.Parse(((Ventilator)e.Item).IP));
         }
     }
 }
