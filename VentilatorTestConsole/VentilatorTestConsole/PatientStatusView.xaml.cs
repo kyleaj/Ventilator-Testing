@@ -93,6 +93,10 @@ namespace VentilatorTestConsole
             canvas.DrawText("Now", new SKPoint(20, h), new SKPaint { Color = SKColors.Black });
             canvas.DrawText("Previously", new SKPoint(w - 60, h), new SKPaint { Color = SKColors.Black });
 
+            canvas.DrawText($"TV: {((int)(status.TV * 100)) / 100f}", new SKPoint(w / 2, 15), new SKPaint { Color = SKColors.Black });
+            canvas.DrawText($"I/E: {((int)(status.IE * 100)) / 100f}", new SKPoint(w / 2, 30), new SKPaint { Color = SKColors.Black });
+
+
             MaxVol = Math.Max(0.25F, (MaxVol + thisMax) / 2);
         }
 
@@ -174,6 +178,8 @@ namespace VentilatorTestConsole
             canvas.DrawText("Time", new SKPoint(w / 2, h), new SKPaint { Color = SKColors.Black });
             canvas.DrawText("Now", new SKPoint(20, h), new SKPaint { Color = SKColors.Black });
             canvas.DrawText("Previously", new SKPoint(w - 60, h), new SKPaint { Color = SKColors.Black });
+
+            canvas.DrawText($"PEEP: {((int)(status.Peep * 10)) / 10000f}", new SKPoint(w / 2, 15), new SKPaint { Color = SKColors.Black });
 
             MaxPress = Math.Max(1, (MaxPress + thisMax) / 2);
             MinPress = Math.Min((MinPress + thisMin) / 2, MaxPress - 500);

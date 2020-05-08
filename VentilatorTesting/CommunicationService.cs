@@ -116,6 +116,36 @@ namespace VentilatorTesting
                 AffectedPatient = Enums.Patient.Both
             });
         }
+
+        public void SendPeepUpdate(float peep, Enums.Patient p)
+        {
+            handler.SendMessage(new Message
+            {
+                Type = Message.MessageType.PeepUpdate,
+                Data = peep,
+                AffectedPatient = p
+            });
+        }
+
+        public void SendTVUpdate(float tv, Enums.Patient p)
+        {
+            handler.SendMessage(new Message
+            {
+                Type = Message.MessageType.TVUpdate,
+                Data = tv,
+                AffectedPatient = p
+            });
+        }
+
+        public void SendIEUpdate(float IE, Enums.Patient p)
+        {
+            handler.SendMessage(new Message
+            {
+                Type = Message.MessageType.IEUpdate,
+                Data = IE,
+                AffectedPatient = p
+            });
+        }
     }
 
     class VentilatorConnectionsHandler : WebSocketsServer

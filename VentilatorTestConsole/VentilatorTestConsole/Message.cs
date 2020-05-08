@@ -17,7 +17,10 @@ namespace VentilatorTestConsole
             StopTestRequest,
             TestIndexRequest,
             TestIndexResponse,
-            PeepSet
+            PeepSet,
+            PeepUpdate,
+            IEUpdate,
+            TVUpdate
         }
 
         public MessageType Type;

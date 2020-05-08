@@ -178,6 +178,40 @@ namespace VentilatorTestConsole
                             else
                                 (Application.Current as App).StatService.Patient2.RecentVolumMeasurements.Add((float)d);
                             break;
+                        case Message.MessageType.IEUpdate:
+                            double di = (double)mess.Data;
+                            //Debug.WriteLine("IE Update " + di);
+                            if (mess.AffectedPatient == Patient.A)
+                            {
+                                (Application.Current as App).StatService.Patient1.IE = (float)di;
+                            } else
+                            {
+                                (Application.Current as App).StatService.Patient2.IE = (float)di;
+                            }
+                            break;
+                        case Message.MessageType.TVUpdate:
+                            double de = (double)mess.Data;
+                            //Debug.WriteLine("TV Update " + de);
+                            if (mess.AffectedPatient == Patient.A)
+                            {
+                                (Application.Current as App).StatService.Patient1.TV = (float)de;
+                            }
+                            else {
+                                (Application.Current as App).StatService.Patient2.TV = (float)de;
+                            }
+                            break;
+                        case Message.MessageType.PeepUpdate:
+                            double df = (double)mess.Data;
+                            //Debug.WriteLine("PEEP Update " + df);
+                            if (mess.AffectedPatient == Patient.A)
+                            {
+                                (Application.Current as App).StatService.Patient1.Peep = (float)df;
+                            }
+                            else
+                            {
+                                (Application.Current as App).StatService.Patient2.Peep = (float)df;
+                            }
+                            break;
                     }
                 }
             }, new System.Threading.CancellationToken(), TaskCreationOptions.LongRunning, TaskScheduler.Default);
