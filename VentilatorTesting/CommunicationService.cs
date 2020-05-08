@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using Makaretu.Dns;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -11,6 +13,7 @@ using Unosquare.Labs.EmbedIO;
 using Unosquare.Labs.EmbedIO.Constants;
 using Unosquare.Labs.EmbedIO.Modules;
 using Unosquare.Swan;
+using Windows.Security.ExchangeActiveSyncProvisioning;
 using Windows.Storage;
 using Windows.UI.Xaml;
 
@@ -20,6 +23,7 @@ namespace VentilatorTesting
     {
         WebServer server;
         VentilatorConnectionsHandler handler;
+        ServiceDiscovery SD;
 
         public CommunicationService()
         {
@@ -63,7 +67,19 @@ namespace VentilatorTesting
                     Debug.WriteLine("Server ran!");
                 }
             });
+            AdvertiseService(IPs[0]);
+        }
 
+        private void AdvertiseService(IPAddress ip)
+        {
+            var service = new ServiceProfile($"Vent-Test", "_venttest._tcp", 54321, new List<IPAddress>() { ip });
+            service.AddProperty("vn", "1.0");
+            service.AddProperty("fn", new EasClientDeviceInformation().FriendlyName);
+            Debug.WriteLine("Made service profile");
+            SD = new ServiceDiscovery();
+            Debug.WriteLine("Made ServiceDiscovery");
+            SD.Advertise(service);
+            Debug.WriteLine("Advertising");
         }
 
         private void Server_StateChanged(object sender, Unosquare.Labs.EmbedIO.Core.WebServerStateChangedEventArgs e)
@@ -129,7 +145,7 @@ namespace VentilatorTesting
             switch (message.Type)
             {
                 case Message.MessageType.StartTestRequest:
-                    var data = (Tuple<string, int>)message.Data;
+                    var data = ((JObject)message.Data).ToObject<Tuple<string, int>>();
                     (Application.Current as App).Sensors.StartTest(data.Item1, data.Item2); // TODO: Handle test already running
                     break;
                 case Message.MessageType.StopTestRequest:

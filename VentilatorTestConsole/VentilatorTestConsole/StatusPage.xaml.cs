@@ -19,5 +19,34 @@ namespace VentilatorTestConsole
             Children.Add(new PatientStatusView(Patient.B) { Title="Patient 2" });
             InitializeComponent ();
 		}
+
+        private void CollectData_Clicked(object sender , EventArgs e)
+        {
+            if ((Application.Current as App).StatService.CurrTest != PatientStatusService.TestStatus.Running)
+            {
+                (Application.Current as App).ComService.StartTest().ContinueWith((res) =>
+                {
+                    if (!res.IsFaulted)
+                    {
+                        Device.BeginInvokeOnMainThread(() =>
+                        {
+                            StartStopTest.Text = "Stop Test";
+                        });
+                    }
+                });
+            } else
+            {
+                (Application.Current as App).ComService.StopTest().ContinueWith((res) =>
+                {
+                    if (!res.IsFaulted)
+                    {
+                        Device.BeginInvokeOnMainThread(() =>
+                        {
+                            StartStopTest.Text = "Start Test";
+                        });
+                    }
+                });
+            }
+        }
 	}
 }

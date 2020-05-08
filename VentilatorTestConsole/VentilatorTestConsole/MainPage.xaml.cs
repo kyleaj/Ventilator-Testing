@@ -14,6 +14,7 @@ namespace VentilatorTestConsole
         public MainPage()
         {
             InitializeComponent();
+            NearbyVents.ItemsSource = (Application.Current as App).ComService.FoundVentilators;
         }
 
         private void JoinVentViaIP_Clicked(object sender, EventArgs e)

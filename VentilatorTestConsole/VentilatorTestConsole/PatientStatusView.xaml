@@ -23,4 +23,5 @@
                             VerticalOptions="FillAndExpand"
                             PaintSurface="PressureDisplay_PaintSurface"/>
     </StackLayout>
+    <!---->
 </ContentPage>

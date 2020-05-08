@@ -33,10 +33,11 @@ namespace VentilatorTesting
             Created = DateTime.Now;
             Running = true;
             string localPath = ApplicationData.Current.LocalFolder.Path;
-            VolumeDataP1 = new FlushableList<float>(Path.Combine(localPath, $"{Name}_{Created}_VolumeData_P1.csv"));
-            PressureDataP1 = new FlushableList<float>(Path.Combine(localPath, $"{Name}_{Created}_PressureData_P1.csv"));
-            VolumeDataP2 = new FlushableList<float>(Path.Combine(localPath, $"{Name}_{Created}_VolumeData_P2.csv"));
-            PressureDataP2 = new FlushableList<float>(Path.Combine(localPath, $"{Name}_{Created}_PressureData_P2.csv"));
+            string date = String.Format("{0:MM_dd_yyyy}", Created);
+            VolumeDataP1 = new FlushableList<float>(Path.Combine(localPath, $"{Name}_{date}_VolumeData_P1.csv"));
+            PressureDataP1 = new FlushableList<float>(Path.Combine(localPath, $"{Name}_{date}_PressureData_P1.csv"));
+            VolumeDataP2 = new FlushableList<float>(Path.Combine(localPath, $"{Name}_{date}_VolumeData_P2.csv"));
+            PressureDataP2 = new FlushableList<float>(Path.Combine(localPath, $"{Name}_{date}_PressureData_P2.csv"));
         }
     }
 }

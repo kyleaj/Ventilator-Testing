@@ -4,4 +4,9 @@
             xmlns:local="clr-namespace:VentilatorTestConsole"
              x:Class="VentilatorTestConsole.StatusPage">
 
+    <TabbedPage.ToolbarItems>
+        <ToolbarItem x:Name="StartStopTest" Text="Start Collecting Data"
+                        Clicked="CollectData_Clicked" />
+    </TabbedPage.ToolbarItems>
+
 </TabbedPage>

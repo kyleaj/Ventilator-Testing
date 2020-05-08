@@ -8,6 +8,7 @@ using System.Net;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading.Tasks;
+using Tmds.MDns;
 using Xamarin.Forms;
 
 namespace VentilatorTestConsole
@@ -17,12 +18,100 @@ namespace VentilatorTestConsole
         private ClientWebSocket VentilatorLink;
         public ObservableCollection<Ventilator> FoundVentilators;
         private bool StayConnected;
+        private ServiceBrowser SB;
 
         public CommunicationService()
         {
             // Start searching for Ventilators
             FoundVentilators = new ObservableCollection<Ventilator>();
             StayConnected = false;
+
+            Debug.WriteLine("Creating new service browser");
+            SB = new ServiceBrowser();
+            SB.ServiceAdded += OnServiceAdded;
+            SB.ServiceRemoved += OnServiceRemoved;
+            string serviceType = "_venttest._tcp";
+            Console.WriteLine("Browsing for type: {0}", serviceType);
+            SB.StartBrowse(serviceType);
+        }
+
+        public async Task StartTest()
+        {
+            Message mess = new Message()
+            {
+                Type = Message.MessageType.StartTestRequest,
+                Data = new Tuple<string, int>("Test", 60 * 60) // Seconds in an hour
+            };
+
+            string serialized_message = JsonConvert.SerializeObject(mess);
+
+            await VentilatorLink.SendAsync(new ArraySegment<byte> (Encoding.UTF8.GetBytes(serialized_message.ToString())), 
+                WebSocketMessageType.Text, true, new System.Threading.CancellationToken());
+        }
+
+        public async Task StopTest()
+        {
+            Message mess = new Message()
+            {
+                Type = Message.MessageType.StopTestRequest,
+                Data = null
+            };
+
+            string serialized_message = JsonConvert.SerializeObject(mess);
+
+            await VentilatorLink.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(serialized_message.ToString())),
+                WebSocketMessageType.Text, true, new System.Threading.CancellationToken());
+        }
+
+        private void OnServiceRemoved(object sender, ServiceAnnouncementEventArgs e)
+        {
+            IPAddress id = e.Announcement.Addresses.First();
+            Ventilator toRemove = null;
+            foreach (var disc in FoundVentilators)
+            {
+                if (IPAddress.Parse(disc.IP) == id)
+                {
+                    toRemove = disc;
+                    break;
+                }
+            }
+            if (toRemove != null)
+            {
+                FoundVentilators.Remove(toRemove);
+            }
+        }
+
+        private void OnServiceAdded(object sender, ServiceAnnouncementEventArgs e)
+        {
+            var detectedVent = new Ventilator
+            {
+                IP = e.Announcement.Addresses.First().ToString(),
+            };
+
+            foreach (var txt in e.Announcement.Txt)
+            {
+                var split = txt.Split('=');
+                var id = split[0];
+                if (id == "fn")
+                {
+                    detectedVent.Name = split[1];
+                }
+            }
+
+            bool found = false;
+            foreach (var disc in FoundVentilators)
+            {
+                if (disc.IP == detectedVent.IP)
+                {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found)
+            {
+                FoundVentilators.Add(detectedVent);
+            }
         }
 
         public async Task ConnectToVentilator(IPAddress ip)

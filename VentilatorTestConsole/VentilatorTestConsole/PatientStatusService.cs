@@ -23,6 +23,7 @@ namespace VentilatorTestConsole
         {
             Patient1 = new PatientStatus(Patient.A);
             Patient2 = new PatientStatus(Patient.B);
+            CurrTest = TestStatus.Stopped;
         }
     }
 }

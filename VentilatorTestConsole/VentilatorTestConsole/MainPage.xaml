@@ -11,13 +11,15 @@
                HorizontalOptions="StartAndExpand"
                FontSize="Title"/>
         <ListView x:Name="NearbyVents" ItemTapped="NearbyVents_ItemTapped" 
-                  SelectionMode="None" IsVisible="False" VerticalOptions="Start" HorizontalOptions="CenterAndExpand">
+                  SelectionMode="None" VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
             <ListView.ItemTemplate>
-                <DataTemplate>
-                    <StackLayout Margin="8">
-                        <Label Text="{Binding Name}"/>
-                        <Label Text="{Binding IP}"/>
-                    </StackLayout>
+                <DataTemplate x:DataType="local:Ventilator">
+                    <ViewCell>
+                        <StackLayout Margin="8">
+                            <Label Text="{Binding Name}" FontSize="Default"/>
+                            <Label Text="{Binding IP}" FontSize="Caption" TextColor="Gray"/>
+                        </StackLayout>
+                    </ViewCell>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
