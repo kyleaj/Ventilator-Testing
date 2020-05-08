@@ -4,7 +4,15 @@ using System.Text;
 
 namespace VentilatorTestConsole
 {
-    class PatientStatusService
+    public class PatientStatusService
     {
+        public PatientStatus Patient1;
+        public PatientStatus Patient2;
+
+        public PatientStatusService()
+        {
+            Patient1 = new PatientStatus(Patient.A);
+            Patient2 = new PatientStatus(Patient.B);
+        }
     }
 }

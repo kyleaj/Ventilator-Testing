@@ -73,5 +73,10 @@ namespace VentilatorTestConsole
             }
             return Items[(index + CurrentIndex) % Items.Length];
         }
+
+        public int Capacity()
+        {
+            return Items.Length;
+        }
     }
 }

@@ -8,11 +8,13 @@ namespace VentilatorTestConsole
     public partial class App : Application
     {
         public CommunicationService ComService;
+        public PatientStatusService StatService;
 
         public App()
         {
             InitializeComponent();
-
+            StatService = new PatientStatusService();
+            ComService = new CommunicationService();
             MainPage = new NavigationPage(new MainPage());
         }
 

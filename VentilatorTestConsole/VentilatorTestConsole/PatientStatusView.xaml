@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:forms="clr-namespace:SkiaSharp.Views.Forms;assembly=SkiaSharp.Views.Forms"
+             x:Class="VentilatorTestConsole.PatientStatusView">
+    <StackLayout>
+        <Label Text="Live Stats:"
+                VerticalOptions="Start" 
+                HorizontalOptions="StartAndExpand"
+               FontSize="Title"/>
+        <Label Text="Volume:"
+                VerticalOptions="Start" 
+                HorizontalOptions="StartAndExpand"
+               FontSize="Title"/>
+        <forms:SKCanvasView x:Name="VolumeDisplay" HorizontalOptions="CenterAndExpand"
+                            VerticalOptions="StartAndExpand"
+                            PaintSurface="VolumeDisplay_PaintSurface" />
+        <Label Text="Pressure:"
+                VerticalOptions="Start" 
+                HorizontalOptions="StartAndExpand"
+               FontSize="Title"/>
+        <forms:SKCanvasView x:Name="PressureDisplay" HorizontalOptions="CenterAndExpand"
+                            VerticalOptions="StartAndExpand"
+                            PaintSurface="PressureDisplay_PaintSurface"/>
+    </StackLayout>
+</ContentPage>
